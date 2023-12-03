@@ -1,0 +1,52 @@
+{
+	"name": "@diba1013/typescript-starter",
+	"version": "0.0.1",
+	"description": "",
+	"keywords": [],
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/diba1013/typescript-starter.git"
+	},
+	"author": "diba1013",
+	"engines": {
+		"node": ">=20",
+		"pnpm": ">=8"
+	},
+	"type": "module",
+	"files": [
+		"dist"
+	],
+	"exports": {
+		"import": "./dist/index.mjs",
+		"require": "./dist/index.js"
+	},
+	"main": "./dist/index.js",
+	"module": "./dist/index.mjs",
+	"types": "./dist/index.d.ts",
+	"scripts": {
+		"prepare": "husky install",
+		"build": "tscz",
+		"build:watch": "tscz --watch",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"lint": "eslint .",
+		"lint:fix": "eslint --fix ."
+	},
+	"devDependencies": {
+		"@commitlint/cli": "^17.7.2",
+		"@commitlint/config-conventional": "^17.7.0",
+		"@diba1013/eslint-config": "^0.8.1",
+		"@diba1013/prettier-config": "^0.8.1",
+		"@diba1013/tscz": "^0.2.1",
+		"@types/node": "^20.8.2",
+		"@vitest/coverage-v8": "^0.34.6",
+		"eslint": "^8.50.0",
+		"husky": "^8.0.3",
+		"lint-staged": "^14.0.1",
+		"prettier": "^3.0.3",
+		"typescript": "^5.2",
+		"vite": "^4.4.11",
+		"vitest": "^0.34.6"
+	}
+}
