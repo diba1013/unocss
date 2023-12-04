@@ -5,6 +5,7 @@
 		"moduleResolution": "Node",
 		"resolveJsonModule": true,
 		"allowSyntheticDefaultImports": true,
+		"verbatimModuleSyntax": true,
 		"strict": true,
 		"noImplicitOverride": true,
 		"esModuleInterop": true,

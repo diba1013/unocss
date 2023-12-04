@@ -1,0 +1,43 @@
+.button {
+	--at-apply: px-3 py-2 rounded text-sm;
+}
+
+.button.primary {
+	--at-apply: bg-primary-container border-2 border-primary-border text-primary-text;
+}
+
+.button:disabled {
+	--at-apply: cursor-default;
+}
+
+.theme {
+	--at-apply: flex flex-col rounded;
+}
+
+.card {
+	--at-apply: flex flex-col rounded p-0.5 gap-0.5 bg-$th-card-border text-$th-card-text;
+}
+
+.card > * {
+	--at-apply: rounded-0 bg-$th-card-background;
+}
+
+.card > *:first-child {
+	--at-apply: rounded-b-0;
+}
+
+.card > *:last-child {
+	--at-apply: rounded-t-0;
+}
+
+.card.primary {
+	--th-card-border: theme("colors.primary.border");
+	--th-card-background: theme("colors.primary.container");
+	--th-card-text: theme("colors.primary.text");
+}
+
+.card.secondary {
+	--th-card-border: theme("colors.secondary.border");
+	--th-card-background: theme("colors.secondary.container");
+	--th-card-text: theme("colors.secondary.text");
+}

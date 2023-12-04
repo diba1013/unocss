@@ -1,3 +1,5 @@
 import { defineConfig } from "@diba1013/eslint-config";
 
-export default defineConfig();
+export default defineConfig({
+	typescript: ["./**/tsconfig.json"],
+});
