@@ -2,20 +2,21 @@ import { name } from "../package.json";
 import { type Preset, definePreset } from "@unocss/core";
 import { parseCssColor } from "@unocss/rule-utils";
 
-type Colors = {
-	[key: string]:
-		| (Colors & {
-				DEFAULT?: string;
-		  })
-		| string;
+export type PresetThemeNestedObject = PresetThemeNested & {
+	DEFAULT?: string;
+};
+
+// This must be an mapped object since it has circular references
+// TODO disable eslint rule?
+// eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
+export type PresetThemeNested = {
+	[key: string]: PresetThemeNestedObject | string;
 };
 
 export type PresetTheme = object & {
-	colors?: Colors;
+	colors?: PresetThemeNested;
 };
-export type PresetThemeDefinitions<Theme extends PresetTheme> = {
-	[Name: string]: Theme;
-};
+export type PresetThemeDefinitions<Theme extends PresetTheme> = Record<string, Theme>;
 
 export type PresetThemeOptions<
 	Theme extends PresetTheme,
@@ -44,38 +45,65 @@ export default function preset<
 		return `${prefix}-${name.join("-")}: ${components.join(" ")};`;
 	}
 
-	const { colors = {} } = themes[normal] ?? {
-		colors: {},
-	};
+	// TODO remove hard coded color variables and have a strategy for variables in place
+	// TODO how deep do we want to unwrap here? currently depth = 1
+	function replaceConstantWithVariable({ colors = {} }: Theme) {
+		const theme: Required<PresetTheme> = { colors: {} };
+		// TODO traversal can be extracted by providing generator with { namespace, key, value } or strategy-based?
+		for (const [key, value] of Object.entries(colors)) {
+			if (value === undefined || value === null) {
+				continue;
+			}
+			if (typeof value === "string") {
+				theme.colors[key] = get(`colors-${key}`, value);
+			}
+			if (typeof value === "object") {
+				const nested: Record<string, string> = {};
+				theme.colors[key] = nested;
 
-	const theme: Required<PresetTheme> = { colors: {} };
-	for (const [key, value] of Object.entries(colors)) {
-		if (value === undefined || value === null) {
-			continue;
-		}
-		if (typeof value === "string") {
-			theme.colors[key] = get(`colors-${key}`, value);
-		}
-		if (typeof value === "object") {
-			const nested: Record<string, string> = {};
-			theme.colors[key] = nested;
+				for (const [shade, color] of Object.entries(value)) {
+					if (typeof color !== "string") {
+						continue;
+					}
 
-			for (const [shade, color] of Object.entries(value)) {
-				if (typeof color !== "string") {
-					continue;
+					nested[shade] =
+						shade === "DEFAULT" // Remap default values
+							? get(`colors-${key}`, color)
+							: get(`colors-${key}-${shade}`, color);
 				}
-
-				nested[shade] =
-					shade === "DEFAULT" // Remap default values
-						? get(`colors-${key}`, color)
-						: get(`colors-${key}-${shade}`, color);
 			}
 		}
+
+		// Casting is necessary for type to become generic
+		return theme as Theme;
+	}
+
+	function unwrapNestedVariables(nested: PresetThemeNested, keys: string[] = []): string[] {
+		const items: string[] = [];
+		// TODO traversal can be extracted by providing generator with { namespace, key, value, path, keys } or strategy-based?
+		for (const [key, value] of Object.entries(nested)) {
+			if (value === undefined || value === null) {
+				continue;
+			}
+			// Merge path
+			const path = [...keys, key];
+			if (typeof value === "string") {
+				const variable = set(key === "DEFAULT" ? keys : path, value);
+				items.push(variable);
+			}
+			if (typeof value === "object") {
+				const variables = unwrapNestedVariables(value, path);
+				items.push(...variables);
+			}
+		}
+
+		return items;
 	}
 
 	return definePreset({
 		name,
-		theme: theme as Theme,
+		theme: replaceConstantWithVariable(themes[normal] ?? {}),
+		// Theme should come before everything else in this preset
 		layers: {
 			theme: 0,
 			default: 1,
@@ -83,31 +111,13 @@ export default function preset<
 		preflights: [
 			{
 				layer: "theme",
+
+				// TODO Honor dark mode and proper default fallback?
 				getCSS: () => {
 					return Object.entries(themes)
 						.map(([name, theme]) => {
-							function flatten(nested: Colors, keys: string[] = []): string {
-								const items: string[] = [];
-
-								for (const [key, value] of Object.entries(nested)) {
-									if (value === undefined || value === null) {
-										continue;
-									}
-									// Merge path
-									const path = [...keys, key];
-									if (typeof value === "string") {
-										const variable = set(key === "DEFAULT" ? keys : path, value);
-										items.push(variable);
-									}
-									if (typeof value === "object") {
-										const variables = flatten(value, path);
-										items.push(variables);
-									}
-								}
-
-								return items.join("");
-							}
-							return `[data-theme="${name}"] {${flatten(theme)}}`;
+							const lines = unwrapNestedVariables(theme);
+							return `[data-theme="${name}"] {${lines.join("")}}`;
 						})
 						.join("\n");
 				},

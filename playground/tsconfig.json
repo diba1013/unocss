@@ -19,7 +19,6 @@
 		"src/**/*.ts",
 		"src/**/*.tsx",
 		"vite.config.ts",
-		"uno.config.ts",
-		"src/main.tsx",
+		"uno.config.ts"
 	]
 }

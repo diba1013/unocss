@@ -3,20 +3,10 @@
 	"compilerOptions": {
 		"composite": true,
 		"baseUrl": ".",
-		"lib": [
-			"ESNext"
-		],
+		"lib": ["ESNext"],
 		"paths": {
-			"@/*": [
-				"src/*"
-			]
+			"@/*": ["src/*"]
 		}
 	},
-	"include": [
-		"src/**/*.ts",
-		"test/**/*.ts",
-		"package.json",
-		"tscz.config.ts",
-		"vitest.config.ts"
-	]
+	"include": ["src/**/*.ts", "test/**/*.ts", "package.json", "tscz.config.ts", "vitest.config.ts"]
 }

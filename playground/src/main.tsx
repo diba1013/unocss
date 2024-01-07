@@ -1,6 +1,8 @@
-import styles from "@/main.module.css";
-import { type Component, For, createSelector, createSignal } from "solid-js";
+// TODO investigate eslint-typescript issues here
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+import { type Component, For, type JSX, createSelector, createSignal } from "solid-js";
 import { render } from "solid-js/web";
+import styles from "@/main.module.css";
 import "@unocss/reset/tailwind-compat.css";
 import "virtual:uno.css";
 
@@ -9,7 +11,7 @@ if (element === null) {
 	throw new Error("cannot mount");
 }
 
-const ThemeCardPalette: Component = () => {
+const ThemeCardPalette: Component = (): JSX.Element => {
 	return (
 		<svg
 			width="80"
@@ -59,7 +61,7 @@ type ThemeDefinition = {
 	description: string;
 };
 
-const ThemeCardDefinition: Component<ThemeDefinition> = (properties) => {
+const ThemeCardDefinition: Component<ThemeDefinition> = (properties): JSX.Element => {
 	return (
 		<div class="flex flex-col w-26 p-3 gap-2 items-center">
 			<span class="decoration-underline case-upper font-bold">{properties.name}</span>
@@ -75,13 +77,13 @@ type ThemeCardProperties = {
 	onClick: (id: string) => void;
 };
 
-const ThemeCard: Component<ThemeCardProperties> = (properties) => {
+const ThemeCard: Component<ThemeCardProperties> = (properties): JSX.Element => {
 	return (
 		<section
-			class={styles["theme"]}
+			class={styles.theme}
 			data-theme={properties.theme.id}
 		>
-			<div class={[styles["card"], styles["primary"]].join(" ")}>
+			<div class={[styles.card, styles.primary].join(" ")}>
 				<ThemeCardDefinition
 					id={properties.theme.id}
 					name={properties.theme.name}
@@ -89,7 +91,7 @@ const ThemeCard: Component<ThemeCardProperties> = (properties) => {
 				/>
 
 				<button
-					class={styles["button"]}
+					class={styles.button}
 					type="button"
 					onClick={[properties.onClick, properties.theme.id]}
 					disabled={properties.active}
@@ -101,7 +103,7 @@ const ThemeCard: Component<ThemeCardProperties> = (properties) => {
 	);
 };
 
-const App: Component = () => {
+const App: Component = (): JSX.Element => {
 	const themes: ThemeDefinition[] = [
 		{
 			id: "tundra:light",
@@ -143,10 +145,10 @@ const App: Component = () => {
 			class="grid content-center justify-center bg-neutral-container"
 			data-theme={theme()}
 		>
-			<main class={[styles["card"], styles["secondary"]].join(" ")}>
+			<main class={[styles.card, styles.secondary].join(" ")}>
 				<div class="flex flex-row gap-4 p-3">
 					<For each={themes}>
-						{(theme) => (
+						{(theme: ThemeDefinition) => (
 							<ThemeCard
 								theme={theme}
 								active={active(theme.id)}
@@ -160,7 +162,7 @@ const App: Component = () => {
 			<div class="flex flex-col gap-1 p-2 items-center">
 				<button
 					type="button"
-					class={[styles["button"], styles["primary"]].join(" ")}
+					class={[styles.button, styles.primary].join(" ")}
 				>
 					Random Button
 				</button>
